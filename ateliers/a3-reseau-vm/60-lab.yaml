@@ -1,0 +1,9 @@
+# /etc/netplan/60-lab.yaml sur la VM UbuntuDev
+# enp0s9 = adaptateur 2 (réseau privé hôte). Le NAT (enp0s8) reste géré par le fichier netplan d'origine.
+network:
+  version: 2
+  ethernets:
+    enp0s9:
+      dhcp4: false
+      addresses:
+        - 192.168.56.20/24

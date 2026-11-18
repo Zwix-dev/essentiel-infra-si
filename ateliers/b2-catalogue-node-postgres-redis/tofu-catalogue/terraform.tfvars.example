@@ -1,0 +1,4 @@
+# Copier ce fichier en terraform.tfvars (non versionné) puis renseigner les valeurs.
+# Identifiant complet de l'image : docker image inspect --format "{{.Id}}" infra-si-catalogue-api:lab
+api_image_id = "sha256:REMPLACER_PAR_IDENTIFIANT_COMPLET"
+db_password  = "REMPLACER_PAR_UN_MOT_DE_PASSE_LOCAL"
