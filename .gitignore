@@ -1,6 +1,7 @@
 # --- Supports de cours (non redistribués) ---
 Essentiels_infrastructure_SI.pdf
 Introduction_TP_Infrastructure_et_Livrable_Git.pdf
+*.pdf
 
 # --- Variables et secrets ---
 .env
@@ -55,6 +56,7 @@ npm-debug.log*
 *.iso
 *.dump
 *.sql.gz
+backup*.sql
 *.bak
 *.log
 

@@ -1,0 +1,5 @@
+# Copier en terraform.tfvars (ignoré par Git) puis adapter.
+vm_host     = "192.168.56.20"
+vm_user     = "vboxuser"
+db_password = "REMPLACER_PAR_UN_MOT_DE_PASSE_LOCAL"
+# api_version est passé par scripts/deploy.sh (-var api_version=...)

@@ -1,0 +1,5 @@
+# Copier en terraform.tfvars (ignoré par Git) et renseigner les valeurs locales.
+sonar_db_password = "a-remplacer"
+
+# Décommenter si un PostgreSQL tourne déjà sur le poste.
+# postgres_port = 5433

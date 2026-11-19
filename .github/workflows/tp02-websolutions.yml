@@ -1,0 +1,59 @@
+# TP2 WebSolutions : test, build, déploiement sur la VM de test et contrôle de santé.
+# Runner auto-hébergé sur le poste qui joint la VM (réseau privé hôte VirtualBox).
+# Déclencheurs limités à push sur main et lancement manuel : aucun code de fork
+# (pull_request) ne s'exécute sur le runner.
+name: tp02-websolutions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tp/02-infrastructure-as-code-websolutions/**"
+      - ".github/workflows/tp02-websolutions.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: websolutions-test
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+    working-directory: tp/02-infrastructure-as-code-websolutions
+
+jobs:
+  test:
+    runs-on: [self-hosted, macOS]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests de l'application
+        run: scripts/test.sh
+
+  build:
+    needs: test
+    runs-on: [self-hosted, macOS]
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version de l'artefact
+        id: version
+        run: echo "version=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - name: Construire l'image sur la VM de test
+        run: scripts/build.sh "${{ steps.version.outputs.version }}"
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted, macOS]
+    environment: test
+    env:
+      TF_VAR_db_password: ${{ secrets.WEBSOLUTIONS_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Déployer avec OpenTofu
+        run: scripts/deploy.sh "${{ needs.build.outputs.version }}"
+      - name: Contrôle de santé
+        run: scripts/healthcheck.sh "${{ needs.build.outputs.version }}"

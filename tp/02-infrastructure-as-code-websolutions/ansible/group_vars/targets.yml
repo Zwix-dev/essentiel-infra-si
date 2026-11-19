@@ -1,0 +1,8 @@
+---
+# Port de l'API sur la boucle locale de la VM (doit correspondre à api_port côté OpenTofu)
+api_port: 3000
+# Nom DNS ou adresse servie par Nginx
+server_name: 192.168.56.20
+# Ports ouverts par le pare-feu, en plus de SSH
+allowed_tcp_ports:
+  - 80

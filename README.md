@@ -31,10 +31,10 @@ Parcours : du service local (conteneur, VM, réseau, stockage) jusqu'à l'infras
 
 | Id | TP | Dossier | Statut |
 |----|----|---------|--------|
-| TP1 | Docker et Minikube : image Node.js vérifiée sous Docker puis Kubernetes | [`tp/01-docker-minikube-node`](tp/01-docker-minikube-node/) | À réaliser |
-| TP2 | Infrastructure as Code pour WebSolutions : provisionnement, configuration, pipeline de test et de déploiement | [`tp/02-infrastructure-as-code-websolutions`](tp/02-infrastructure-as-code-websolutions/) | À réaliser |
-| TP3 | OpenTofu avancé : plateforme DevSecOps | [`tp/03-opentofu-avance/devsecops`](tp/03-opentofu-avance/devsecops/) | À réaliser |
-| TP3 | OpenTofu avancé : pile de supervision | [`tp/03-opentofu-avance/supervision`](tp/03-opentofu-avance/supervision/) | À réaliser |
+| TP1 | Docker et Minikube : image Node.js vérifiée sous Docker puis Kubernetes | [`tp/01-docker-minikube-node`](tp/01-docker-minikube-node/) | Réalisé |
+| TP2 | Infrastructure as Code pour WebSolutions : provisionnement, configuration, pipeline de test et de déploiement | [`tp/02-infrastructure-as-code-websolutions`](tp/02-infrastructure-as-code-websolutions/) | Code livré, exécution sur la VM à consigner |
+| TP3 | OpenTofu avancé : plateforme DevSecOps | [`tp/03-opentofu-avance/devsecops`](tp/03-opentofu-avance/devsecops/) | Réalisé |
+| TP3 | OpenTofu avancé : pile de supervision | [`tp/03-opentofu-avance/supervision`](tp/03-opentofu-avance/supervision/) | Réalisé |
 
 ## Organisation du dépôt
 

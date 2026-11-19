@@ -1,0 +1,117 @@
+---
+- name: Configurer la VM de test WebSolutions
+  hosts: targets
+  become: true
+
+  handlers:
+    - name: Recharger Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+  tasks:
+    - name: Relever les paquets installés
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Installer Nginx, ufw et curl
+      ansible.builtin.apt:
+        name: [nginx, ufw, curl]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    # Docker est déjà présent si la VM vient de l'atelier A2 (docker-ce ou docker.io).
+    - name: Installer Docker si aucun moteur n'est présent
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+      when:
+        - "'docker-ce' not in ansible_facts.packages"
+        - "'docker.io' not in ansible_facts.packages"
+
+    - name: Activer et démarrer Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    # Nécessaire pour qu'OpenTofu et le pipeline pilotent Docker via ssh://
+    - name: Autoriser le compte de déploiement à utiliser Docker
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+
+    - name: Rouvrir la connexion SSH pour prendre en compte le groupe
+      ansible.builtin.meta: reset_connection
+
+    - name: Créer le dossier de l'application
+      ansible.builtin.file:
+        path: /etc/websolutions
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    # Fichier témoin utilisé pour démontrer la remise en conformité
+    - name: Déployer le fichier témoin
+      ansible.builtin.copy:
+        dest: /etc/websolutions/environnement.txt
+        content: |
+          Environnement : test
+          Géré par Ansible, ne pas modifier à la main.
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Déployer la configuration Nginx du reverse proxy
+      ansible.builtin.template:
+        src: websolutions.conf.j2
+        dest: /etc/nginx/sites-available/websolutions.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Recharger Nginx
+
+    - name: Activer le site WebSolutions
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/websolutions.conf
+        dest: /etc/nginx/sites-enabled/websolutions.conf
+        state: link
+      notify: Recharger Nginx
+
+    - name: Désactiver le site par défaut
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Recharger Nginx
+
+    - name: Vérifier la configuration Nginx
+      ansible.builtin.command: nginx -t
+      changed_when: false
+
+    - name: Activer et démarrer Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    # Pare-feu : SSH d'abord pour ne pas couper la session, puis HTTP, puis refus par défaut.
+    - name: Autoriser SSH
+      community.general.ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: Autoriser les ports applicatifs
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop: "{{ allowed_tcp_ports }}"
+
+    - name: Refuser le reste du trafic entrant et activer ufw
+      community.general.ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
